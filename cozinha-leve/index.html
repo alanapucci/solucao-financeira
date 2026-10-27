@@ -1,0 +1,1230 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cozinha Leve</title>
+<meta name="description" content="Receitas saudáveis, baratas e rápidas, cardápio da semana e lista de compras.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2F6B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cozinha Leve">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px/1.4 system-ui, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: horta de feira — barra de "vontades" no topo, receitas em grade à esquerda, ateliê com a Claude à direita (empilha no celular) */
+:root {
+  --bg: #F2F5EC;
+  --surface: #FFFFFF;
+  --ink: #1C271F;
+  --muted: #5E6D61;
+  --line: #D6DDCB;
+  --basil: #2F6B45;
+  --basil-soft: #E1ECDD;
+  --tangerine: #D9741C;
+  --tangerine-soft: #FBE9D7;
+  --on-basil: #FFFFFF;
+  --shadow: 0 1px 2px rgba(28,39,31,.06), 0 6px 20px rgba(28,39,31,.06);
+  --f-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131A15; --surface: #1B241E; --ink: #E8EEE4; --muted: #9DAC9F; --line: #2E3B32;
+    --basil: #7DBE8F; --basil-soft: #213328; --tangerine: #F0A057; --tangerine-soft: #3A2B1C;
+    --on-basil: #0F1A12; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131A15; --surface: #1B241E; --ink: #E8EEE4; --muted: #9DAC9F; --line: #2E3B32;
+  --basil: #7DBE8F; --basil-soft: #213328; --tangerine: #F0A057; --tangerine-soft: #3A2B1C;
+  --on-basil: #0F1A12; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--tangerine); outline-offset: 2px; }
+
+/* topo */
+.top { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
+.top h1 { font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 800; line-height: 1; }
+.top h1 span { color: var(--basil); }
+.top p { margin: 6px 0 0; color: var(--muted); max-width: 52ch; }
+.fav-toggle { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-weight: 600; display: inline-flex; gap: 8px; align-items: center; }
+.fav-toggle[aria-pressed="true"] { background: var(--tangerine-soft); border-color: var(--tangerine); }
+.fav-toggle b { font-family: var(--f-mono); font-weight: 500; }
+
+/* vontades */
+.cravings { background: var(--basil); color: var(--on-basil); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.cravings .lbl { font-family: var(--f-display); font-weight: 700; font-size: 1.25rem; }
+.crave-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.crave { border: 1.5px solid color-mix(in srgb, var(--on-basil) 45%, transparent); background: transparent; color: var(--on-basil); border-radius: 999px; padding: 7px 14px; cursor: pointer; font-weight: 600; }
+.crave:hover { background: color-mix(in srgb, var(--on-basil) 12%, transparent); }
+.crave[aria-pressed="true"] { background: var(--on-basil); color: var(--basil); border-color: var(--on-basil); }
+.swap { margin: 0; font-size: .95rem; min-height: 1.5em; }
+.swap strong { font-weight: 600; }
+
+/* corpo */
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+
+.filters { display: flex; flex-direction: column; gap: 10px; }
+.search { position: relative; }
+.search input { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 12px 14px; font-size: 1rem; }
+.frow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.frow .k { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); width: 84px; flex-shrink: 0; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 11px; cursor: pointer; font-size: .88rem; }
+.chip[aria-pressed="true"] { background: var(--basil-soft); border-color: var(--basil); color: var(--ink); font-weight: 600; }
+.count { color: var(--muted); font-size: .9rem; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--basil); cursor: pointer; text-decoration: underline; font-size: .9rem; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; margin-top: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; text-align: left; transition: transform .15s ease, box-shadow .15s ease; }
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.card h3 { font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+.card .ing { color: var(--muted); font-size: .88rem; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.tag { font-family: var(--f-mono); font-size: .75rem; padding: 2px 8px; border-radius: 6px; background: var(--basil-soft); color: var(--ink); font-variant-numeric: tabular-nums; }
+.tag.cost { background: var(--tangerine-soft); }
+.card .head { display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+.star { font-size: 1.1rem; line-height: 1; color: var(--tangerine); }
+.empty { border: 1px dashed var(--line); border-radius: 14px; padding: 24px; color: var(--muted); text-align: center; }
+
+/* ateliê Claude */
+.studio { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 12px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+@media (max-width: 900px) { .studio { position: static; } }
+.studio h2 { font-size: 1.35rem; }
+.studio p.sub { margin: -6px 0 0; color: var(--muted); font-size: .9rem; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: .78rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.field textarea, .field select { border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 9px 11px; width: 100%; }
+.field textarea { resize: vertical; min-height: 72px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { border: 0; background: var(--tangerine); color: #1C1208; font-weight: 700; border-radius: 12px; padding: 12px 16px; cursor: pointer; font-family: var(--f-display); font-size: 1.02rem; }
+.btn:disabled { opacity: .55; cursor: progress; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); font-family: var(--f-body); font-weight: 600; font-size: .9rem; padding: 8px 12px; }
+.status { font-size: .9rem; color: var(--muted); margin: 0; }
+.status.err { color: var(--tangerine); }
+.ai-out { border-top: 1px dashed var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.ai-out h3 { font-size: 1.15rem; }
+
+/* receita aberta */
+dialog { border: 0; border-radius: 18px; padding: 0; max-width: 560px; width: calc(100% - 32px); background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+dialog::backdrop { background: rgba(10,16,12,.5); }
+.dlg { padding: 22px; display: flex; flex-direction: column; gap: 14px; max-height: 85vh; overflow-y: auto; }
+.dlg h2 { font-size: 1.6rem; line-height: 1.1; }
+.dlg h4 { margin: 0 0 4px; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+.dlg ul, .dlg ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.tip { background: var(--basil-soft); border-radius: 12px; padding: 10px 12px; font-size: .92rem; }
+.tip b { font-family: var(--f-display); }
+.dlg-actions { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; }
+.foot { color: var(--muted); font-size: .82rem; max-width: 70ch; }
+/* abas */
+.tabpanel { display: flex; flex-direction: column; gap: 24px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tab { background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.02rem; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--tangerine); }
+.vhead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 10px; }
+.vhead h2 { font-size: 1.6rem; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.badge { font-family: var(--f-body); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; background: var(--tangerine-soft); padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+.week { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; margin-block: 14px; }
+.day { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.day h3 { font-size: 1.05rem; }
+.meal { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 6px; font-size: .9rem; align-items: baseline; }
+.meal .when { font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.meal button { background: none; border: 0; padding: 0; text-align: left; cursor: pointer; color: var(--basil); text-decoration: underline; text-underline-offset: 2px; font: inherit; }
+.meal .min { font-family: var(--f-mono); font-size: .72rem; color: var(--muted); margin-left: 4px; white-space: nowrap; }
+.tip ul { margin: 6px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; }
+.tip p { margin: 8px 0 0; }
+.shop { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-top: 14px; align-items: start; }
+.sec { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.sec h3 { font-size: 1rem; margin-bottom: 4px; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; align-items: baseline; padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: .92rem; }
+.marks { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .8rem; color: var(--muted); }
+.marks .grp { display: inline-flex; gap: 16px; }
+.marks .grp + .grp { padding-left: 16px; border-left: 1px solid var(--line); }
+@media (max-width: 420px) { .marks .grp + .grp { padding-left: 0; border-left: 0; } }
+.marks .taste input { accent-color: var(--tangerine); }
+.item .like { color: var(--basil); font-size: .78rem; font-weight: 600; }
+.item .dislike { color: var(--tangerine); font-size: .78rem; font-weight: 600; }
+.marks label { display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
+.item:last-child { border-bottom: 0; }
+.item input { accent-color: var(--basil); width: 16px; height: 16px; }
+.item .q { color: var(--muted); font-size: .82rem; }
+.item .p { font-family: var(--f-mono); font-size: .78rem; font-variant-numeric: tabular-nums; }
+.item.done .nm { text-decoration: line-through; color: var(--muted); }
+.total { display: flex; justify-content: space-between; gap: 6px 16px; flex-wrap: wrap; align-items: baseline; background: var(--basil); color: var(--on-basil); border-radius: 14px; padding: 12px 16px; margin-block: 14px; font-family: var(--f-display); font-weight: 700; }
+.total .n { font-family: var(--f-mono); font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.total small { font-family: var(--f-body); font-weight: 500; opacity: .85; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; cursor: pointer; }
+.check input { accent-color: var(--basil); }
+.field input[type="number"] { border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 9px 11px; width: 100%; }
+#copyFallback { width: 100%; min-height: 120px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); padding: 8px; font-family: var(--f-mono); font-size: .8rem; }
+/* refeições em casa */
+.mealbar { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.mealbar .mb-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 16px; }
+.mealbar h2 { font-size: 1.1rem; }
+.mealbar .mb-head p { margin: 0; color: var(--muted); font-size: .85rem; }
+.mb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px 16px; }
+.mb-meal { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.mb-meal .nm { font-weight: 600; width: 64px; }
+.mb-meal .chip[aria-pressed="false"] { color: var(--muted); text-decoration: line-through; }
+.meal .out { color: var(--muted); font-style: italic; }
+.needs { display: flex; flex-wrap: wrap; gap: 6px; }
+.needs .chip { font-size: .8rem; padding: 3px 9px; }
+.field .hint { font-size: .8rem; color: var(--muted); margin: 0; }
+/* despensa */
+.pantry-part { margin-top: 28px; padding-top: 20px; border-top: 2px solid var(--line); display: flex; flex-direction: column; gap: 12px; }
+.pantry-part .status { margin: 0; }
+.pantry-add { display: flex; gap: 8px; flex-wrap: wrap; }
+.pantry-add input { flex: 1 1 220px; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 11px 14px; font-size: 1rem; }
+.pantry-add .btn { font-size: .95rem; padding: 10px 14px; }
+.pantry { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; align-items: start; }
+.pantry h3 { display: flex; align-items: center; gap: 8px; }
+.sec.falta { border-color: var(--tangerine); }
+.pitem { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--line); font-size: .93rem; }
+.pitem:last-child { border-bottom: 0; }
+.mini { border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 8px; padding: 2px 8px; font-size: .78rem; cursor: pointer; white-space: nowrap; }
+.pempty { color: var(--muted); font-size: .9rem; margin: 6px 0; }
+.item.disliked { opacity: .55; }
+.nochip { border: 1px solid var(--tangerine); background: var(--tangerine-soft); color: var(--ink); border-radius: 999px; padding: 3px 10px; font-size: .82rem; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Cozinha <span>Leve</span></h1>
+      <p>Receitas saudáveis, baratas e rápidas para o dia a dia. Escolha sua vontade, filtre pelo tempo e pelo bolso, ou peça uma receita feita com o que você tem em casa.</p>
+    </div>
+    <button class="fav-toggle" id="favToggle" aria-pressed="false">★ Meus favoritos <b id="favCount">0</b></button>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Seções">
+    <button class="tab" role="tab" data-tab="receitas" aria-selected="true">Receitas</button>
+    <button class="tab" role="tab" data-tab="cardapio" aria-selected="false">Cardápio da semana</button>
+    <button class="tab" role="tab" data-tab="compras" aria-selected="false">Lista de compras</button>
+  </nav>
+
+  <section class="mealbar" aria-label="Refeições que eu faço em casa">
+    <div class="mb-head">
+      <h2>Refeições que eu faço em casa</h2>
+      <p>Vale para todas as abas. Se mudar, gere o cardápio e a lista de novo.</p>
+    </div>
+    <div class="mb-grid" id="mbGrid"></div>
+  </section>
+
+  <div id="tab-receitas" class="tabpanel">
+
+  <section class="cravings" aria-label="Vontades">
+    <div class="lbl">Tô com vontade de…</div>
+    <div class="crave-row" id="craveRow"></div>
+    <p class="swap" id="swap">Escolha uma vontade e veja trocas mais leves que matam a mesma vontade.</p>
+  </section>
+
+  <div class="main">
+    <section>
+      <div class="filters">
+        <div class="search">
+          <input id="q" type="search" placeholder="Busque por nome ou ingrediente: banana, ovo, atum…" aria-label="Buscar receitas">
+        </div>
+        <div class="frow" id="fMeal"><span class="k">Refeição</span></div>
+        <div class="frow" id="fTime"><span class="k">Tempo</span></div>
+        <div class="frow" id="fCost"><span class="k">Custo</span></div>
+        <div class="frow" id="fPrep"><span class="k">Preparo</span></div>
+        <div class="count"><span><span id="count"></span> <button class="linkbtn" id="dislikeToggle" hidden></button></span><button class="linkbtn" id="clear">Limpar filtros</button></div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <aside class="studio" aria-label="Pedir uma receita">
+      <h2>Peça uma receita</h2>
+      <p class="sub">A Claude monta uma receita saudável e barata com o que você tem.</p>
+      <div class="field">
+        <label for="aiHave">O que tem em casa</label>
+        <textarea id="aiHave">2 ovos, meia cenoura, aveia, uma banana madura, arroz de ontem</textarea>
+        <button class="linkbtn" type="button" id="aiUsePantry" style="align-self:start">Preencher com a minha despensa</button>
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="aiCrave">Vontade</label>
+          <select id="aiCrave"></select>
+        </div>
+        <div class="field">
+          <label for="aiTime">Tempo</label>
+          <select id="aiTime">
+            <option value="5">Até 5 min</option>
+            <option value="15" selected>Até 15 min</option>
+            <option value="30">Até 30 min</option>
+          </select>
+        </div>
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="aiPrep">Tenho</label>
+          <select id="aiPrep">
+            <option value="qualquer utensílio">Qualquer coisa</option>
+            <option value="só micro-ondas">Só micro-ondas</option>
+            <option value="sem fogão (nada para aquecer)">Sem fogão</option>
+            <option value="só uma frigideira">Só frigideira</option>
+            <option value="air fryer">Air fryer</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="aiNote">Restrição</label>
+          <select id="aiNote">
+            <option value="">Nenhuma</option>
+            <option value="sem lactose">Sem lactose</option>
+            <option value="sem glúten">Sem glúten</option>
+            <option value="vegetariana">Vegetariana</option>
+            <option value="sem açúcar adicionado">Sem açúcar</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" id="aiGo">Criar minha receita</button>
+      <button class="btn ghost" id="aiStop" hidden>Parar</button>
+      <p class="status" id="aiStatus"></p>
+      <div class="ai-out" id="aiOut" hidden></div>
+    </aside>
+  </div>
+  </div>
+
+  <div id="tab-plan" class="main" hidden>
+    <section>
+      <div id="view-cardapio">
+        <div class="vhead">
+          <h2>Cardápio da semana <span class="badge" id="menuBadge">Exemplo</span></h2>
+          <div class="actions">
+            <button class="btn" id="menuGo">Gerar meu cardápio</button>
+            <button class="btn ghost" id="menuPantryGo">Só com o que eu tenho</button>
+            <button class="btn ghost" id="menuStop" hidden>Parar</button>
+          </div>
+        </div>
+        <p class="status" id="menuStatus">Este cardápio é um exemplo. Preencha o seu perfil e toque em “Gerar meu cardápio” para montar um para a sua rotina.</p>
+        <div class="week" id="week"></div>
+        <div class="tip" id="prepBox"></div>
+        <p><button class="linkbtn" id="toList">Ver a lista de compras deste cardápio →</button></p>
+      </div>
+
+      <div id="view-compras" hidden>
+        <div class="vhead">
+          <h2>Lista de compras <span class="badge" id="listBadge">Exemplo</span></h2>
+          <div class="actions">
+            <button class="btn" id="listGo">Gerar minha lista</button>
+            <button class="btn ghost" id="listStop" hidden>Parar</button>
+            <button class="btn ghost" id="listCopy">Copiar lista</button>
+          </div>
+        </div>
+        <div class="filters" style="margin-top:12px">
+          <div class="frow" id="fPeriod"><span class="k">Período</span></div>
+          <label class="check"><input type="checkbox" id="useMenu" checked> Basear no meu cardápio da semana</label>
+        </div>
+        <p class="status" id="listStatus">Esta lista é um exemplo para 1 pessoa por 1 semana. Escolha o período e gere a sua.</p>
+        <textarea id="copyFallback" readonly hidden aria-label="Lista para copiar"></textarea>
+        <div class="shop" id="shop"></div>
+        <div class="total"><span>Total estimado <small id="listLeft"></small></span><span class="n" id="listTotal"></span></div>
+        <div class="tip" id="listTips"></div>
+
+        <section class="pantry-part" id="pantryPart" aria-label="Minha despensa">
+          <div class="vhead">
+            <h2>Minha despensa</h2>
+            <div class="actions"><button class="btn" id="pantryMenuGo">Criar cardápio com o que eu já tenho</button></div>
+          </div>
+          <p class="status">Tudo o que você marca como “Já tenho” ou “Comprei” na lista vem para cá, e você também pode anotar à mão. O que você já tem não entra na próxima lista. O que falta, entra.</p>
+    <div class="pantry-add">
+      <input id="pantryInput" type="text" placeholder="Ex.: arroz, ovos, banana" aria-label="Itens da despensa">
+      <button class="btn" type="button" id="addTenho">Já tenho</button>
+      <button class="btn ghost" type="button" id="addFalta">Não tenho</button>
+    </div>
+    <div class="frow" id="pantrySug"><span class="k">Toque se tem</span></div>
+    <p class="status" id="pantryStatus"></p>
+    <div class="pantry">
+      <div class="sec"><h3>Já tenho <span class="badge" id="nTenho">0</span></h3><div id="listTenho"></div></div>
+      <div class="sec falta"><h3>Não tenho <span class="badge" id="nFalta">0</span></h3><div id="listFalta"></div></div>
+    </div>
+        </section>
+      </div>
+    </section>
+
+    <aside class="studio" aria-label="Meu perfil">
+      <h2>Meu perfil</h2>
+      <p class="sub">Usado para montar o cardápio e a lista de compras.</p>
+      <div class="two">
+        <div class="field"><label for="pIdade">Idade</label><input id="pIdade" type="number" min="1" max="120" placeholder="Ex.: 32"></div>
+        <div class="field"><label for="pPessoas">Pessoas</label><input id="pPessoas" type="number" min="1" max="12" value="1"></div>
+      </div>
+      <div class="field">
+        <label for="pObjetivo">Objetivo</label>
+        <select id="pObjetivo">
+          <option>Comer melhor no geral</option>
+          <option>Emagrecer com saúde</option>
+          <option>Ter mais energia no dia</option>
+          <option>Ganhar massa muscular</option>
+          <option>Controlar a vontade de doce</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="pNecessidades">Minhas necessidades</label>
+        <p class="hint">O que você precisa no dia a dia. Toque para adicionar ou escreva do seu jeito.</p>
+        <div class="needs" id="needChips"></div>
+        <textarea id="pNecessidades" placeholder="Ex.: comida mais leve à noite, opções de doces saudáveis"></textarea>
+      </div>
+      <div class="field"><label for="pGostos">Alimentos que eu quero no meu cardápio</label><textarea id="pGostos" placeholder="Ex.: tapioca, frango, frutas vermelhas, cuscuz"></textarea></div>
+      <div class="field"><label for="pNao">Alergias</label><textarea id="pNao" placeholder="Ex.: amendoim, camarão, lactose"></textarea></div>
+      <div class="field">
+        <label for="tasteInput">Alimentos que eu não gosto</label>
+        <p class="hint">Fica salvo aqui. Não entra em receitas, cardápios nem listas de compras. Toque num alimento para tirar.</p>
+        <div class="needs" id="naoChips"></div>
+        <div class="pantry-add">
+          <input id="tasteInput" type="text" placeholder="Ex.: jiló, fígado, beterraba">
+          <button class="btn ghost" type="button" id="tasteAdd">Adicionar</button>
+        </div>
+      </div>
+      <p class="hint" id="tasteSummary"></p>
+      <div class="field">
+        <label for="pRotina">Minha rotina</label>
+        <select id="pRotina">
+          <option>Trabalho fora o dia todo</option>
+          <option>Trabalho em casa (home office)</option>
+          <option>Trabalho e estudo, pouco tempo</option>
+          <option>Trabalho em turnos / horários variados</option>
+          <option>Fico em casa a maior parte do dia</option>
+        </select>
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="pTempo">Tempo por refeição</label>
+          <select id="pTempo">
+            <option>Até 10 min</option>
+            <option selected>Até 20 min</option>
+            <option>Até 30 min</option>
+          </select>
+        </div>
+        <div class="field"><label for="pOrcamento">Mercado/mês (R$)</label><input id="pOrcamento" type="number" min="0" step="50" placeholder="Ex.: 600"></div>
+      </div>
+      <label class="check"><input type="checkbox" id="pMarmita" checked> Posso adiantar marmitas no fim de semana</label>
+    </aside>
+  </div>
+
+  <p class="foot">Custos são estimativas por porção com preços médios de mercado e mudam conforme a região e a época. As receitas são sugestões gerais de alimentação, não substituem orientação de nutricionista. Favoritos, perfil, cardápio e lista ficam salvos só neste navegador. Para necessidades específicas de saúde, procure um nutricionista.</p>
+</div>
+
+<dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+
+<script>
+const CRAVINGS = {
+  doce: { label: "Doce", swap: "<strong>Troca:</strong> em vez de bolo ou bala, fruta com canela, banana com aveia ou maçã assada. A fibra segura a fome por mais tempo." },
+  chocolate: { label: "Chocolate", swap: "<strong>Troca:</strong> cacau em pó 100% dá o sabor do chocolate com bem menos açúcar. Combine com banana para adoçar." },
+  crocante: { label: "Algo crocante", swap: "<strong>Troca:</strong> no lugar do salgadinho de pacote, pipoca de panela, grão-de-bico tostado ou chips de batata-doce." },
+  fastfood: { label: "Fast-food", swap: "<strong>Troca:</strong> pizza de frigideira, hambúrguer de feijão e batata recheada saem em casa por uma fração do preço do delivery." },
+  cremoso: { label: "Algo cremoso", swap: "<strong>Troca:</strong> banana congelada batida vira sorvete; iogurte natural com fruta substitui a sobremesa pronta." },
+  salgado: { label: "Algo salgado", swap: "<strong>Troca:</strong> ovo, atum, sardinha e grão-de-bico dão sabor e proteína, e saciam mais do que biscoito salgado." },
+};
+const MEALS = { cafe: "Café da manhã", lanche: "Lanche", almoco: "Almoço", jantar: "Jantar" };
+const TIMES = [["5", "Até 5 min"], ["15", "Até 15 min"], ["30", "Até 30 min"]];
+const COSTS = [["2", "Até R$ 2"], ["4", "Até R$ 4"]];
+const PREPS = { sem: "Sem fogão", micro: "Micro-ondas", fogao: "Fogão / frigideira", forno: "Forno / air fryer", liq: "Liquidificador" };
+
+// t = minutos, c = custo estimado por porção (R$), p = preparo, r = refeições, v = vontades
+const RECIPES = [
+  { id: "banana-aveia", n: "Banana amassada com aveia e canela", t: 3, c: 1.5, p: "sem", r: ["cafe", "lanche"], v: ["doce"],
+    i: ["1 banana bem madura", "2 colheres (sopa) de aveia em flocos", "Canela a gosto", "1 colher (chá) de pasta de amendoim (opcional)"],
+    s: ["Amasse a banana com um garfo num pote.", "Misture a aveia e polvilhe canela.", "Se quiser, finalize com a pasta de amendoim."],
+    d: "Banana com pintinhas pretas é a mais doce. Congele as que estão passando do ponto em rodelas: viram sorvete depois." },
+  { id: "sorvete-banana", n: "Sorvete de banana com cacau", t: 5, c: 2, p: "liq", r: ["lanche"], v: ["doce", "chocolate", "cremoso"],
+    i: ["2 bananas congeladas em rodelas", "1 colher (sopa) de cacau em pó 100%", "2 colheres (sopa) de leite ou água"],
+    s: ["Bata a banana congelada no liquidificador ou mixer, raspando as laterais.", "Junte o cacau e o leite aos poucos até ficar cremoso.", "Sirva na hora ou leve ao congelador por 20 min para firmar."],
+    d: "Esse é o melhor destino para banana madura demais. Zero desperdício e sem açúcar adicionado." },
+  { id: "mousse-cacau", n: "Mousse rápida de cacau e pasta de amendoim", t: 5, c: 2.5, p: "sem", r: ["lanche"], v: ["chocolate", "cremoso", "doce"],
+    i: ["1 banana madura", "1 colher (sopa) de cacau em pó", "1 colher (sopa) de pasta de amendoim", "3 colheres (sopa) de iogurte natural"],
+    s: ["Amasse muito bem a banana até virar um purê.", "Misture cacau, pasta de amendoim e iogurte.", "Leve à geladeira por 10 min se der tempo."],
+    d: "Compre iogurte natural em pote grande: sai bem mais barato por porção que os potinhos." },
+  { id: "chocolate-quente", n: "Chocolate quente cremoso de cacau", t: 5, c: 2, p: "micro", r: ["lanche", "jantar"], v: ["chocolate", "cremoso", "doce"],
+    i: ["1 xícara de leite (ou bebida vegetal)", "1 colher (sopa) de cacau em pó", "1/2 banana madura ou 1 colher (chá) de mel", "Canela"],
+    s: ["Bata tudo no liquidificador ou misture bem com um garfo.", "Aqueça 1 min e 30 s no micro-ondas, mexendo na metade.", "Polvilhe canela."],
+    d: "Ótimo para a vontade de doce da noite. Bebida quente demora mais para tomar e acalma a vontade." },
+  { id: "maca-assada", n: "Maçã assada no micro-ondas", t: 4, c: 1.8, p: "micro", r: ["lanche", "jantar"], v: ["doce"],
+    i: ["1 maçã", "Canela", "1 colher (sopa) de aveia", "Uvas-passas ou castanhas picadas (opcional)"],
+    s: ["Corte a maçã em cubos, sem descascar.", "Misture canela e aveia num refratário.", "Micro-ondas por 2 a 3 min até amolecer."],
+    d: "A casca tem boa parte das fibras. Lave bem e use tudo." },
+  { id: "cookie-banana", n: "Cookies de banana e aveia", t: 20, c: 1, p: "forno", r: ["lanche", "cafe"], v: ["doce", "chocolate"],
+    i: ["2 bananas maduras", "1 xícara de aveia em flocos", "Canela", "Cacau ou gotas de chocolate 70% (opcional)"],
+    s: ["Amasse as bananas e misture a aveia até formar uma massa.", "Faça bolinhas achatadas numa forma untada.", "Asse a 180 °C (forno ou air fryer) por 12 a 15 min."],
+    d: "Rende cerca de 10 cookies. Guarde em pote fechado e leve como lanche: evita compra por impulso na rua." },
+  { id: "iogurte-mamao", n: "Iogurte natural com mamão e aveia", t: 2, c: 2.5, p: "sem", r: ["cafe", "lanche"], v: ["cremoso", "doce"],
+    i: ["1 pote (170 g) de iogurte natural", "1 fatia de mamão", "1 colher (sopa) de aveia", "Fio de mel (opcional)"],
+    s: ["Pique o mamão.", "Monte iogurte, mamão e aveia num pote.", "Finalize com mel, se quiser."],
+    d: "Troque o mamão pela fruta mais barata da feira da semana. Fruta da estação costuma custar menos." },
+  { id: "pipoca", n: "Pipoca de panela com páprica", t: 7, c: 1, p: "fogao", r: ["lanche"], v: ["crocante", "salgado"],
+    i: ["1/3 xícara de milho de pipoca", "1 colher (sopa) de azeite ou óleo", "Sal e páprica a gosto"],
+    s: ["Aqueça o óleo com 3 grãos na panela tampada.", "Quando estourarem, junte o resto do milho e chacoalhe.", "Desligue quando os estalos espaçarem. Tempere com sal e páprica."],
+    d: "Milho de pipoca a granel é dos lanches mais baratos que existem. Fuja da pipoca de micro-ondas de pacote, que vem cheia de gordura." },
+  { id: "grao-crocante", n: "Grão-de-bico crocante", t: 25, c: 2, p: "forno", r: ["lanche"], v: ["crocante", "salgado"],
+    i: ["1 xícara de grão-de-bico cozido", "1 colher (chá) de azeite", "Sal, páprica, cominho ou alho em pó"],
+    s: ["Seque bem os grãos com pano de prato.", "Misture azeite e temperos.", "Asse a 200 °C por 20 a 25 min (air fryer: 15 min), chacoalhando na metade."],
+    d: "Não jogue fora a água do cozimento (aquafaba): ela substitui a clara de ovo em receitas." },
+  { id: "chips-batata-doce", n: "Chips de batata-doce", t: 25, c: 1.5, p: "forno", r: ["lanche"], v: ["crocante", "fastfood", "salgado"],
+    i: ["1 batata-doce média", "1 colher (chá) de azeite", "Sal e alecrim"],
+    s: ["Corte em lâminas bem finas, com casca.", "Misture com azeite e temperos.", "Asse a 200 °C por 20 a 25 min, virando na metade, até dourar."],
+    d: "Casca bem lavada fica na receita: mais fibra e menos lixo." },
+  { id: "crepioca", n: "Crepioca de queijo e tomate", t: 6, c: 2.5, p: "fogao", r: ["cafe", "lanche", "jantar"], v: ["salgado", "fastfood"],
+    i: ["1 ovo", "2 colheres (sopa) de goma de tapioca", "1 fatia de queijo branco", "Tomate e orégano"],
+    s: ["Bata o ovo com a tapioca e uma pitada de sal.", "Despeje numa frigideira antiaderente quente e espalhe.", "Vire, recheie com queijo e tomate e dobre."],
+    d: "Goma de tapioca em pacote de 1 kg rende dezenas de porções e dura meses no armário." },
+  { id: "omelete-caneca", n: "Omelete de caneca no micro-ondas", t: 3, c: 2.5, p: "micro", r: ["cafe", "jantar"], v: ["salgado"],
+    i: ["2 ovos", "Tomate, cebola ou o legume que sobrou", "Sal, pimenta e cheiro-verde"],
+    s: ["Bata os ovos numa caneca untada.", "Junte os legumes picados e tempere.", "Micro-ondas por 1 min, mexa e mais 30 a 45 s."],
+    d: "Ótima para usar aquela meia cenoura ou meio pimentão esquecido na geladeira." },
+  { id: "ovos-couve", n: "Ovos mexidos com couve e talos", t: 6, c: 2, p: "fogao", r: ["cafe", "jantar"], v: ["salgado"],
+    i: ["2 ovos", "1 folha de couve com o talo", "1 dente de alho", "Fio de azeite e sal"],
+    s: ["Pique o talo bem fininho e a folha em tiras.", "Refogue alho e talo no azeite por 1 min, junte a folha.", "Acrescente os ovos batidos e mexa até firmar."],
+    d: "Talo de couve, brócolis e beterraba tem sabor e nutrientes. Picado fino, ninguém percebe." },
+  { id: "cuscuz-ovo", n: "Cuscuz de milho com ovo", t: 10, c: 2, p: "fogao", r: ["cafe", "jantar"], v: ["salgado"],
+    i: ["1/2 xícara de flocão de milho", "Água e sal", "1 ovo", "Tomate ou cebola picados (opcional)"],
+    s: ["Hidrate o flocão com água e sal por 5 min.", "Cozinhe na cuscuzeira ou no micro-ondas tampado (2 a 3 min).", "Sirva com ovo frito na frigideira ou cozido."],
+    d: "Flocão é um dos carboidratos mais baratos do mercado e é naturalmente sem glúten." },
+  { id: "pizza-frigideira", n: "Pizza de frigideira de aveia", t: 12, c: 4, p: "fogao", r: ["jantar", "lanche"], v: ["fastfood", "salgado"],
+    i: ["2 ovos", "3 colheres (sopa) de aveia", "2 colheres (sopa) de molho de tomate", "Queijo, tomate, orégano e o que tiver"],
+    s: ["Bata ovos, aveia e uma pitada de sal.", "Despeje na frigideira untada, tampe e cozinhe em fogo baixo até firmar.", "Vire, cubra com molho, queijo e recheio e tampe até derreter."],
+    d: "Sexta à noite sem delivery: custa cerca de um décimo de uma pizza pedida." },
+  { id: "hamburguer-feijao", n: "Hambúrguer de feijão", t: 25, c: 3, p: "fogao", r: ["almoco", "jantar"], v: ["fastfood"],
+    i: ["1 xícara de feijão cozido e escorrido", "3 colheres (sopa) de farinha de aveia ou de mandioca", "1/2 cebola ralada, alho e cominho", "Pão, alface e tomate"],
+    s: ["Amasse o feijão e misture cebola, temperos e farinha até dar liga.", "Modele 2 discos e leve 15 min à geladeira.", "Doure na frigideira untada, 3 min de cada lado. Monte no pão."],
+    d: "Destino perfeito para o feijão que sobrou do almoço de domingo." },
+  { id: "batata-recheada", n: "Batata recheada no micro-ondas", t: 10, c: 3, p: "micro", r: ["almoco", "jantar"], v: ["fastfood", "cremoso"],
+    i: ["1 batata grande", "Atum, frango desfiado ou ovo", "1 colher (sopa) de requeijão ou iogurte", "Cheiro-verde"],
+    s: ["Fure a batata com garfo e leve ao micro-ondas por 6 a 8 min, virando na metade.", "Abra ao meio e amasse um pouco o miolo.", "Misture o recheio com requeijão e coloque por cima."],
+    d: "Batata é barata o ano todo e sacia muito. Coma com a casca." },
+  { id: "arroz-mexido", n: "Arroz mexido com legumes e ovo", t: 12, c: 3, p: "fogao", r: ["almoco", "jantar"], v: ["salgado"],
+    i: ["1 xícara de arroz de ontem", "1 ovo", "Cenoura, abobrinha, ervilha ou o legume que sobrou", "Shoyu ou sal, alho e cebolinha"],
+    s: ["Refogue alho e os legumes picados por 3 min.", "Junte o arroz e solte bem os grãos.", "Abra um espaço, mexa o ovo ali e misture tudo. Tempere."],
+    d: "Arroz frio de um dia fica até mais soltinho. Não jogue fora a sobra." },
+  { id: "macarrao-sardinha", n: "Macarrão com sardinha e tomate", t: 15, c: 4, p: "fogao", r: ["almoco", "jantar"], v: ["salgado"],
+    i: ["100 g de macarrão", "1/2 lata de sardinha", "1 tomate picado", "Alho, azeite e cheiro-verde"],
+    s: ["Cozinhe o macarrão.", "Refogue alho e tomate até desmanchar, junte a sardinha.", "Misture o macarrão com um pouco da água do cozimento."],
+    d: "Sardinha em lata é das proteínas mais baratas e tem ômega-3. A outra metade vira pasta para o lanche." },
+  { id: "sopa-talos", n: "Sopa de legumes com talos", t: 25, c: 3.5, p: "fogao", r: ["jantar"], v: ["cremoso", "salgado"],
+    i: ["1 batata", "1 cenoura", "Talos de brócolis, couve ou salsinha", "1/2 cebola, alho, sal"],
+    s: ["Refogue cebola e alho.", "Junte os legumes e talos picados e cubra com água.", "Cozinhe 20 min. Bata metade no liquidificador para ficar cremosa."],
+    d: "Congele em porções. Uma panela vira 4 jantares prontos." },
+  { id: "salada-grao", n: "Salada de grão-de-bico no pote", t: 10, c: 4, p: "sem", r: ["almoco"], v: ["salgado"],
+    i: ["1 xícara de grão-de-bico cozido", "Tomate, pepino e cebola roxa picados", "Suco de 1/2 limão, azeite e sal", "Cheiro-verde"],
+    s: ["Pique os legumes.", "Misture tudo com o grão-de-bico.", "Tempere com limão, azeite e sal. Leve na marmita."],
+    d: "Cozinhe 500 g de grão-de-bico de uma vez e congele em porções: fica bem mais barato que o enlatado." },
+  { id: "pasta-atum", n: "Pão integral com pasta de atum", t: 5, c: 3.5, p: "sem", r: ["lanche", "cafe"], v: ["salgado", "cremoso"],
+    i: ["1/2 lata de atum", "2 colheres (sopa) de iogurte natural ou requeijão", "Cenoura ralada e cheiro-verde", "2 fatias de pão integral"],
+    s: ["Escorra o atum.", "Misture iogurte, cenoura ralada e temperos.", "Passe no pão. A pasta dura 2 dias na geladeira."],
+    d: "Iogurte no lugar da maionese deixa a pasta mais leve e mais barata." },
+  { id: "wrap-frango", n: "Wrap de frango desfiado", t: 10, c: 5, p: "sem", r: ["almoco", "lanche"], v: ["fastfood", "salgado"],
+    i: ["1 tortilha ou pão folha", "Frango cozido desfiado", "Alface, cenoura ralada e tomate", "Iogurte com limão como molho"],
+    s: ["Espalhe o molho na tortilha.", "Coloque frango e salada.", "Enrole firme e corte ao meio. Se quiser, doure na frigideira."],
+    d: "Cozinhe e desfie 500 g de frango no domingo: rende recheio para a semana inteira." },
+];
+
+const MEALS_DEFAULT = { cafe: { u: true, f: true }, almoco: { u: false, f: true }, lanche: { u: true, f: true }, jantar: { u: true, f: true } };
+let meals = (() => { try { return JSON.parse(localStorage.getItem("cl-meals")) || MEALS_DEFAULT; } catch { return MEALS_DEFAULT; } })();
+const mealActive = k => !!(meals[k] && (meals[k].u || meals[k].f));
+const isWeekend = dia => /^(sab|dom)/.test(norm(String(dia)));
+const isHome = (dia, k) => !!(meals[k] && meals[k][isWeekend(dia) ? "f" : "u"]);
+let taste = (() => { try { return JSON.parse(localStorage.getItem("cl-taste")) || { gosto: [], nao: [] }; } catch { return { gosto: [], nao: [] }; } })();
+// receita tem algum alimento que a pessoa não gosta? (compara sem acento e aceita plural)
+const hasDislike = r => taste.nao.some(d => {
+  const n = norm(d).trim().replace(/s$/, "");
+  return n.length > 1 && norm(r.n + " " + r.i.join(" ")).includes(n);
+});
+const state = { q: "", showDisliked: false, crave: null, meal: null, time: null, cost: null, prep: null, favOnly: false };
+let favs = loadFavs();
+
+function loadFavs() {
+  try { return JSON.parse(localStorage.getItem("cl-favs") || "{}"); } catch { return {}; }
+}
+function saveFavs() {
+  try { localStorage.setItem("cl-favs", JSON.stringify(favs)); } catch {}
+  document.getElementById("favCount").textContent = Object.keys(favs).length;
+}
+const brl = v => "R$ " + v.toFixed(2).replace(".", ",");
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+function chipGroup(el, entries, key) {
+  for (const [val, label] of entries) {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = label; b.dataset.val = val; b.setAttribute("aria-pressed", "false");
+    b.onclick = () => { state[key] = state[key] === val ? null : val; syncChips(); render(); };
+    el.append(b);
+  }
+}
+function syncChips() {
+  for (const [id, key] of [["fMeal", "meal"], ["fTime", "time"], ["fCost", "cost"], ["fPrep", "prep"]])
+    document.querySelectorAll("#" + id + " .chip").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.val === state[key])));
+  document.querySelectorAll("#fMeal .chip").forEach(b => b.hidden = !mealActive(b.dataset.val));
+  document.querySelectorAll(".crave").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.val === state.crave)));
+  document.getElementById("swap").innerHTML = state.crave ? CRAVINGS[state.crave].swap : "Escolha uma vontade e veja trocas mais leves que matam a mesma vontade.";
+  document.getElementById("favToggle").setAttribute("aria-pressed", String(state.favOnly));
+}
+
+function allRecipes() {
+  const custom = Object.values(favs).filter(f => f.custom);
+  return RECIPES.concat(custom);
+}
+function matches(r, ignoreDislike) {
+  if (!ignoreDislike && !state.showDisliked && hasDislike(r)) return false;
+  if (state.favOnly && !favs[r.id]) return false;
+  if (state.crave && !(r.v || []).includes(state.crave)) return false;
+  if (state.meal && !(r.r || []).includes(state.meal)) return false;
+  if (r.r && r.r.length && !r.r.some(mealActive)) return false;
+  if (state.time && r.t > +state.time) return false;
+  if (state.cost && r.c > +state.cost) return false;
+  if (state.prep && r.p !== state.prep) return false;
+  if (state.q) {
+    const hay = norm(r.n + " " + r.i.join(" "));
+    if (!norm(state.q).split(/[\s,]+/).filter(Boolean).every(w => hay.includes(w))) return false;
+  }
+  return true;
+}
+
+function render() {
+  const list = allRecipes().filter(r => matches(r)).sort((a, b) => a.t - b.t);
+  const grid = document.getElementById("grid");
+  document.getElementById("count").textContent = list.length === 1 ? "1 receita" : list.length + " receitas";
+  const hidden = allRecipes().filter(r => hasDislike(r) && matches(r, true)).length;
+  const dt = document.getElementById("dislikeToggle");
+  dt.hidden = !hidden;
+  dt.textContent = state.showDisliked ? `Esconder as ${hidden} com alimentos que você não gosta` : `· ${hidden} escondida${hidden > 1 ? "s" : ""} (não gosto). Mostrar`;
+  if (!list.length) {
+    grid.innerHTML = state.favOnly && !Object.keys(favs).length
+      ? '<div class="empty">Você ainda não salvou favoritos. Abra uma receita e toque em “Salvar nos favoritos”.</div>'
+      : '<div class="empty">Nenhuma receita com esses filtros. Tente tirar um filtro ou peça uma receita sob medida ao lado.</div>';
+    return;
+  }
+  grid.innerHTML = list.map(r => `
+    <button class="card" data-id="${esc(r.id)}">
+      <div class="head"><h3>${esc(r.n)}</h3>${favs[r.id] ? '<span class="star" aria-label="Favorito">★</span>' : ""}</div>
+      <p class="ing">${esc(r.i.join(" · "))}</p>
+      <div class="meta">
+        <span class="tag">${r.t} min</span>
+        <span class="tag cost">~${brl(r.c)}</span>
+        <span class="tag">${esc(PREPS[r.p] || r.p)}</span>
+      </div>
+    </button>`).join("");
+  grid.querySelectorAll(".card").forEach(c => c.onclick = () => openRecipe(allRecipes().find(r => r.id === c.dataset.id)));
+}
+
+function recipeHTML(r) {
+  return `
+    <div class="meta"><span class="tag">${r.t} min</span><span class="tag cost">~${brl(r.c)} por porção</span><span class="tag">${esc(PREPS[r.p] || r.p)}</span>${r.custom ? '<span class="tag">Feita pela Claude</span>' : ""}</div>
+    <div><h4>Ingredientes</h4><ul>${r.i.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+    <div><h4>Modo de preparo</h4><ol>${r.s.map(x => `<li>${esc(x)}</li>`).join("")}</ol></div>
+    ${r.h ? `<div class="tip"><b>Por que é leve:</b> ${esc(r.h)}</div>` : ""}
+    ${r.d ? `<div class="tip"><b>Dica sem desperdício:</b> ${esc(r.d)}</div>` : ""}`;
+}
+
+const dlg = document.getElementById("dlg");
+function openRecipe(r) {
+  if (!r) return;
+  const isFav = !!favs[r.id];
+  document.getElementById("dlgBody").innerHTML = `
+    <h2>${esc(r.n)}</h2>${recipeHTML(r)}
+    <div class="dlg-actions">
+      <button class="btn" id="dlgFav">${isFav ? "Tirar dos favoritos" : "★ Salvar nos favoritos"}</button>
+      <button class="btn ghost" id="dlgClose">Fechar</button>
+    </div>`;
+  document.getElementById("dlgClose").onclick = () => dlg.close();
+  document.getElementById("dlgFav").onclick = () => {
+    if (favs[r.id]) delete favs[r.id]; else favs[r.id] = r.custom ? r : { id: r.id };
+    saveFavs(); render(); openRecipe(r);
+  };
+  if (!dlg.open) dlg.showModal();
+}
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+
+// montar UI
+const craveRow = document.getElementById("craveRow");
+const aiCrave = document.getElementById("aiCrave");
+aiCrave.innerHTML = '<option value="">Tanto faz</option>';
+for (const [k, v] of Object.entries(CRAVINGS)) {
+  const b = document.createElement("button");
+  b.className = "crave"; b.dataset.val = k; b.textContent = v.label; b.setAttribute("aria-pressed", "false");
+  b.onclick = () => { state.crave = state.crave === k ? null : k; aiCrave.value = state.crave || ""; syncChips(); render(); };
+  craveRow.append(b);
+  aiCrave.insertAdjacentHTML("beforeend", `<option value="${k}">${v.label}</option>`);
+}
+chipGroup(document.getElementById("fMeal"), Object.entries(MEALS), "meal");
+chipGroup(document.getElementById("fTime"), TIMES, "time");
+chipGroup(document.getElementById("fCost"), COSTS, "cost");
+chipGroup(document.getElementById("fPrep"), Object.entries(PREPS), "prep");
+document.getElementById("q").addEventListener("input", e => { state.q = e.target.value; render(); });
+document.getElementById("clear").onclick = () => {
+  Object.assign(state, { q: "", crave: null, meal: null, time: null, cost: null, prep: null, favOnly: false });
+  document.getElementById("q").value = ""; aiCrave.value = ""; syncChips(); render();
+};
+document.getElementById("dislikeToggle").onclick = () => { state.showDisliked = !state.showDisliked; render(); };
+document.getElementById("favToggle").onclick = () => { state.favOnly = !state.favOnly; syncChips(); render(); };
+
+saveFavs(); syncChips(); render();
+
+// Peça uma receita (Claude)
+const aiGo = document.getElementById("aiGo"), aiStop = document.getElementById("aiStop");
+const aiStatus = document.getElementById("aiStatus"), aiOut = document.getElementById("aiOut");
+let sample = null, ctl = null, aiBlocked = false;
+const aiErr = {
+  rate_limited: "Muitos pedidos seguidos. Espere um pouco e tente de novo.",
+  session_expired: "Sua sessão expirou. Entre de novo na Claude e tente outra vez.",
+  refused: "Não consegui montar essa receita. Mude os ingredientes e tente de novo.",
+  invalid_json: "A resposta veio incompleta. Tente de novo.",
+  empty_completion: "Não veio nenhuma receita. Tente com menos ingredientes.",
+};
+const NO_AI = "Gerar com a Claude só funciona na versão aberta dentro do Claude. Aqui, as receitas, os exemplos, a despensa e as listas funcionam normalmente.";
+function hideAI(msg) {
+  aiBlocked = true;
+  for (const b of [aiGo, menuGo, listGo, document.getElementById("menuPantryGo"), document.getElementById("pantryMenuGo")]) b.disabled = true;
+  for (const el of [aiStatus, menuStatus, listStatus]) {
+    el.className = "status"; el.textContent = msg + " ";
+    const a = document.createElement("a");
+    a.href = "https://claude.ai/artifact/Dn8hZAoyEX4mfKny5FDQdQ"; a.target = "_blank"; a.rel = "noopener";
+    a.textContent = "Abrir no Claude"; a.style.color = "var(--basil)";
+    el.append(a);
+  }
+}
+(async () => {
+  try { sample = await window.claude?.use?.("sample"); } catch { sample = null; }
+  if (!sample) hideAI(NO_AI);
+})();
+
+aiGo.onclick = async () => {
+  if (!sample) return;
+  const have = document.getElementById("aiHave").value.trim();
+  const crave = aiCrave.value ? CRAVINGS[aiCrave.value].label.toLowerCase() : "qualquer";
+  const time = document.getElementById("aiTime").value;
+  const prep = document.getElementById("aiPrep").value;
+  const note = document.getElementById("aiNote").value;
+  const prompt = `Você é uma cozinheira prática que ajuda uma pessoa no Brasil a comer de forma mais saudável e sustentável gastando pouco.
+Crie UMA receita saudável, barata e fácil, em português do Brasil.
+- Ingredientes que a pessoa tem em casa: ${have || "não informado (use itens baratos e comuns no Brasil)"}
+- Vontade do momento: ${crave}
+- Tempo máximo: ${time} minutos
+- Utensílios: ${prep}
+- Restrição: ${note || "nenhuma"}
+- Necessidades do dia a dia da pessoa: ${document.getElementById("pNecessidades").value.trim() || "nenhuma informada"}
+- Alergias (nunca use): ${document.getElementById("pNao").value.trim() || "nenhuma informada"}
+- Não gosta (não use): ${taste.nao.join(", ") || "não informado"}
+Priorize o que a pessoa já tem, aceite no máximo 2 itens básicos extras (sal, azeite, temperos não contam). Evite açúcar refinado e ultraprocessados. Aproveite sobras, cascas e talos quando fizer sentido.
+Responda só com um objeto JSON neste formato:
+{"nome": string, "tempo_min": number, "custo_reais_por_porcao": number, "preparo": "sem"|"micro"|"fogao"|"forno"|"liq", "refeicoes": ["cafe"|"lanche"|"almoco"|"jantar"], "ingredientes": [string], "passos": [string], "por_que_e_leve": string (1 frase), "dica_sem_desperdicio": string (1 frase)}`;
+  ctl = new AbortController();
+  aiGo.disabled = true; aiStop.hidden = false; aiOut.hidden = true;
+  aiStatus.className = "status"; aiStatus.textContent = "Pensando na sua receita…";
+  try {
+    const j = await sample.json(prompt, { modelTier: "quick", signal: ctl.signal, cache: false });
+    if (!j || !j.nome || !Array.isArray(j.ingredientes) || !Array.isArray(j.passos)) throw { code: "invalid_json" };
+    const r = {
+      id: "ia-" + Date.now(), custom: true, n: String(j.nome),
+      t: Math.max(1, Math.round(+j.tempo_min || +time)), c: Math.max(0, +j.custo_reais_por_porcao || 0),
+      p: PREPS[j.preparo] ? j.preparo : "fogao",
+      r: Array.isArray(j.refeicoes) ? j.refeicoes.filter(m => MEALS[m]) : [],
+      v: aiCrave.value ? [aiCrave.value] : [],
+      i: j.ingredientes.map(String), s: j.passos.map(String),
+      h: j.por_que_e_leve ? String(j.por_que_e_leve) : "", d: j.dica_sem_desperdicio ? String(j.dica_sem_desperdicio) : "",
+    };
+    aiStatus.textContent = "";
+    aiOut.hidden = false;
+    aiOut.innerHTML = `<h3>${esc(r.n)}</h3>${recipeHTML(r)}<div class="dlg-actions"><button class="btn ghost" id="aiSave">★ Salvar nos favoritos</button><button class="btn ghost" id="aiAgain">Quero outra</button></div>`;
+    document.getElementById("aiSave").onclick = e => { favs[r.id] = r; saveFavs(); render(); e.target.textContent = "Salva nos favoritos ✓"; e.target.disabled = true; };
+    document.getElementById("aiAgain").onclick = () => aiGo.click();
+  } catch (e) {
+    if (e?.code === "cancelled") { aiStatus.textContent = "Pedido cancelado."; }
+    else if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(e?.code)) {
+      hideAI(NO_AI); aiStop.hidden = true; return;
+    } else {
+      aiStatus.className = "status err";
+      aiStatus.textContent = aiErr[e?.code] || "Algo deu errado na conexão. Tente de novo em instantes.";
+    }
+  } finally {
+    aiGo.disabled = !sample || aiBlocked;
+    aiStop.hidden = true;
+  }
+};
+aiStop.onclick = () => ctl?.abort();
+
+// ---------- Perfil, cardápio e lista de compras ----------
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+const $ = id => document.getElementById(id);
+const R = id => RECIPES.find(r => r.id === id);
+const menuGo = $("menuGo"), menuStop = $("menuStop"), menuStatus = $("menuStatus");
+const listGo = $("listGo"), listStop = $("listStop"), listStatus = $("listStatus");
+
+// Gosto / não gosto, marcados nos itens da lista
+const tasteOf = name => taste.gosto.some(t => norm(t) === norm(name)) ? "gosto" : taste.nao.some(t => norm(t) === norm(name)) ? "nao" : null;
+function setTaste(name, val) {
+  const drop = arr => arr.filter(t => norm(t) !== norm(name));
+  taste = { gosto: drop(taste.gosto), nao: drop(taste.nao) };
+  if (val) taste[val].push(name);
+  store.set("cl-taste", taste); syncTaste();
+}
+function syncTaste() {
+  const chips = document.getElementById("naoChips");
+  chips.innerHTML = taste.nao.length
+    ? taste.nao.map(n => `<button class="nochip" type="button" data-name="${esc(n)}" aria-label="Tirar ${esc(n)}">${esc(n)} ×</button>`).join("")
+    : '<span class="hint">Nada salvo ainda. Escreva abaixo ou marque “Não gosto” na lista de compras.</span>';
+  chips.querySelectorAll(".nochip").forEach(b => b.onclick = () => { setTaste(b.dataset.name, null); renderList(); render(); });
+  document.getElementById("tasteSummary").textContent = taste.gosto.length
+    ? "Você gosta de: " + taste.gosto.join(", ") + ". Esses alimentos têm preferência no cardápio."
+    : "Marque “Gosto” nos itens da lista de compras para dar preferência a eles no cardápio.";
+}
+function addDislikes() {
+  const inp = document.getElementById("tasteInput");
+  const names = inp.value.split(/[,;\n]+/).map(t => t.trim()).filter(Boolean);
+  if (!names.length) { inp.focus(); return; }
+  names.forEach(n => setTaste(n.charAt(0).toUpperCase() + n.slice(1), "nao"));
+  inp.value = ""; renderList(); render();
+}
+document.getElementById("tasteAdd").onclick = addDislikes;
+document.getElementById("tasteInput").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addDislikes(); } });
+syncTaste();
+
+const PF = ["pIdade", "pPessoas", "pObjetivo", "pNecessidades", "pGostos", "pNao", "pRotina", "pTempo", "pOrcamento", "pMarmita"];
+const profile = store.get("cl-profile", {});
+for (const id of PF) {
+  const el = $(id);
+  if (profile[id] !== undefined) { if (el.type === "checkbox") el.checked = profile[id]; else el.value = profile[id]; }
+  const save = () => { profile[id] = el.type === "checkbox" ? el.checked : el.value; store.set("cl-profile", profile); };
+  el.addEventListener("input", save); el.addEventListener("change", save);
+}
+function profileText() {
+  const sel = id => $(id).options[$(id).selectedIndex].text;
+  return [
+    "Idade: " + ($("pIdade").value || "não informada"),
+    "Pessoas que vão comer: " + ($("pPessoas").value || 1),
+    "Objetivo: " + sel("pObjetivo"),
+    "Necessidades do dia a dia (atenda a todas): " + ($("pNecessidades").value.trim() || "nenhuma informada"),
+    "Alimentos que quer no cardápio (inclua): " + ($("pGostos").value.trim() || "não informado"),
+    "Alergias (NUNCA use, nem como ingrediente): " + ($("pNao").value.trim() || "nenhuma informada"),
+    "Gosta de: " + (taste.gosto.join(", ") || "não informado"),
+    "Não gosta (evite): " + (taste.nao.join(", ") || "não informado"),
+    "Rotina: " + sel("pRotina"),
+    "Tempo para cozinhar por refeição: " + sel("pTempo"),
+    "Refeições feitas em casa: " + mealsText(),
+    "Pode adiantar marmitas no fim de semana: " + ($("pMarmita").checked ? "sim" : "não"),
+    "Orçamento de mercado por mês: " + ($("pOrcamento").value ? "R$ " + $("pOrcamento").value : "não informado"),
+  ].join("\n");
+}
+
+const BLOCK = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"];
+async function runAI({ prompt, go, stop, status, waitMsg, done }) {
+  if (!sample || aiBlocked) return;
+  const c = new AbortController();
+  go.disabled = true; stop.hidden = false; stop.onclick = () => c.abort();
+  status.className = "status"; status.textContent = waitMsg;
+  try { done(await sample.json(prompt, { signal: c.signal, cache: false })); }
+  catch (e) {
+    if (e?.code === "cancelled") status.textContent = "Pedido cancelado.";
+    else if (BLOCK.includes(e?.code)) hideAI(NO_AI);
+    else { status.className = "status err"; status.textContent = aiErr[e?.code] || "Algo deu errado na conexão. Tente de novo em instantes."; }
+  } finally { go.disabled = !sample || aiBlocked; stop.hidden = true; }
+}
+
+// Cardápio
+const MEAL_KEYS = [["cafe", "Café"], ["almoco", "Almoço"], ["lanche", "Lanche"], ["jantar", "Jantar"]];
+const m = id => ({ n: R(id).n, id, t: R(id).t });
+const x = (n, t) => ({ n, id: null, t });
+const EXAMPLE_MENU = { example: true, obs: "", dias: [
+  { dia: "Segunda", cafe: m("banana-aveia"), almoco: x("Marmita: arroz, feijão, frango desfiado e salada", 5), lanche: m("iogurte-mamao"), jantar: m("omelete-caneca") },
+  { dia: "Terça", cafe: m("cuscuz-ovo"), almoco: m("salada-grao"), lanche: m("pipoca"), jantar: m("sopa-talos") },
+  { dia: "Quarta", cafe: m("crepioca"), almoco: x("Marmita: arroz, feijão, carne moída com abobrinha", 5), lanche: m("maca-assada"), jantar: m("arroz-mexido") },
+  { dia: "Quinta", cafe: m("iogurte-mamao"), almoco: m("wrap-frango"), lanche: m("cookie-banana"), jantar: m("macarrao-sardinha") },
+  { dia: "Sexta", cafe: m("banana-aveia"), almoco: x("Marmita: arroz, feijão, ovo cozido e legumes", 5), lanche: m("grao-crocante"), jantar: m("pizza-frigideira") },
+  { dia: "Sábado", cafe: m("ovos-couve"), almoco: m("hamburguer-feijao"), lanche: m("sorvete-banana"), jantar: m("batata-recheada") },
+  { dia: "Domingo", cafe: m("cuscuz-ovo"), almoco: x("Almoço caseiro e preparo das marmitas da semana", 60), lanche: m("chocolate-quente"), jantar: x("Sopa de legumes congelada da terça", 5) },
+], prep: [
+  "Cozinhe arroz, feijão e 500 g de frango desfiado e monte as 3 marmitas da semana.",
+  "Cozinhe grão-de-bico e congele em porções (salada de terça e lanche de sexta).",
+  "Lave e pique folhas e legumes em potes fechados.",
+  "Congele as bananas maduras em rodelas para o sorvete e o café da manhã.",
+] };
+let menu = store.get("cl-menu", null) || EXAMPLE_MENU;
+
+function renderMenu() {
+  $("menuBadge").hidden = !menu.example && !menu.fromPantry;
+  $("menuBadge").textContent = menu.example ? "Exemplo" : "Com o que eu tenho";
+  $("week").innerHTML = menu.dias.map(d => `<div class="day"><h3>${esc(d.dia)}</h3>${MEAL_KEYS.map(([k, l]) => {
+    if (!isHome(d.dia, k)) return `<div class="meal"><span class="when">${l}</span><span class="out">Fora de casa</span></div>`;
+    const ml = d[k];
+    if (!ml) return menu.fromPantry ? `<div class="meal"><span class="when">${l}</span><span class="out">Falta ingrediente</span></div>` : "";
+    const name = ml.id && R(ml.id) ? `<button data-id="${esc(ml.id)}">${esc(ml.n)}</button>` : `<span>${esc(ml.n)}</span>`;
+    return `<div class="meal"><span class="when">${l}</span><span>${name}${ml.t ? `<span class="min">${ml.t} min</span>` : ""}</span></div>`;
+  }).join("")}</div>`).join("");
+  $("week").querySelectorAll("button[data-id]").forEach(b => b.onclick = () => openRecipe(R(b.dataset.id)));
+  const box = $("prepBox");
+  const extra = menu.extra || [];
+  box.hidden = !menu.prep.length && !menu.obs && !extra.length;
+  box.innerHTML = (menu.prep.length ? `<b>${menu.fromPantry ? "Para adiantar:" : "Adiante no fim de semana:"}</b><ul>${menu.prep.map(p => `<li>${esc(p)}</li>`).join("")}</ul>` : "") + (menu.obs ? `<p>${esc(menu.obs)}</p>` : "")
+    + (extra.length ? `<p><b>Para completar, vale comprar:</b> ${esc(extra.join(", "))}. <button class="linkbtn" id="extraToList">Anotar em “Não tenho”</button></p>` : "");
+  const xb = $("extraToList");
+  if (xb) xb.onclick = () => { extra.forEach(n => addPantry(n, "falta")); savePantry(); menuStatus.className = "status"; menuStatus.textContent = "Anotado em “Não tenho”. Esses itens entram na sua próxima lista de compras."; };
+}
+
+function menuPrompt() {
+  return `Você ajuda uma pessoa no Brasil a comer de forma mais saudável, sustentável e barata, com comida simples do dia a dia.
+Perfil:
+${profileText()}
+
+Receitas que já existem no app (use quando combinarem, com o id exato):
+${RECIPES.map(r => `${r.id}: ${r.n} (${r.t} min, refeições: ${r.r.join("/")})`).join("\n")}
+
+Monte um cardápio de segunda a domingo com café da manhã, almoço, lanche e jantar.
+Regras:
+- Planeje SÓ as refeições feitas em casa (veja o perfil). Nas refeições fora de casa, devolva null.
+- Respeite o tempo por refeição e a rotina. Se a pessoa trabalha fora e o almoço de dias úteis é feito em casa, ele vira marmita.
+- Se ela pode adiantar marmitas, planeje o que preparar no fim de semana.
+- Use primeiro o que a pessoa já tem em casa: ${pantryText().tenho}.
+- Atenda a cada necessidade do dia a dia do perfil (ex.: jantar leve, doce saudável no lanche).
+- Nunca use alimentos de alergia. Evite o que ela não gosta. Inclua os alimentos que ela quer no cardápio e priorize os que ela gosta.
+- Barato e acessível: arroz, feijão, ovos, frango, legumes e frutas comuns. Repita ingredientes na semana para não desperdiçar e reaproveite sobras.
+- Ajuste porções e equilíbrio à idade e ao objetivo, sem dar conselho médico.
+- Nomes curtos dos pratos (até 60 caracteres).
+Responda só com JSON neste formato:
+{"dias":[{"dia":"Segunda","cafe":{"nome":string,"receita_id":string|null,"min":number},"almoco":{...},"lanche":{...},"jantar":{...}}],"preparo_antecipado":[string],"observacao":string (1 frase)}`;
+}
+function pantryMenuPrompt() {
+  return `Você ajuda uma pessoa no Brasil a comer de forma saudável sem precisar ir ao mercado agora.
+Perfil:
+${profileText()}
+
+Ingredientes que a pessoa TEM em casa: ${pantry.tenho.join(", ")}.
+
+Receitas do app (use o id só se der para fazer a receita com o que ela tem):
+${RECIPES.map(r => `${r.id}: ${r.n} (ingredientes: ${r.i.join("; ")})`).join("\n")}
+
+Monte um cardápio usando SOMENTE esses ingredientes, mais água, sal, óleo ou azeite e temperos secos comuns.
+Regras:
+- Planeje SÓ as refeições feitas em casa (veja o perfil). Nas refeições fora de casa, devolva null.
+- Monte para quantos dias der, até 7, começando na segunda. Se faltar ingrediente para uma refeição, devolva null nela.
+- Use primeiro o que estraga rápido. Varie o preparo do mesmo ingrediente para não enjoar.
+- Respeite o tempo por refeição, as necessidades do dia a dia, as alergias (nunca use) e o que a pessoa não gosta.
+- Nomes curtos dos pratos (até 60 caracteres).
+Responda só com JSON neste formato:
+{"dias":[{"dia":"Segunda","cafe":{"nome":string,"receita_id":string|null,"min":number}|null,"almoco":...,"lanche":...,"jantar":...}],"preparo_antecipado":[string],"observacao":string (1 frase),"para_completar":[string] (até 5 itens baratos que completariam o cardápio)}`;
+}
+function genMenu(fromPantry) {
+  if (fromPantry && !pantry.tenho.length) {
+    showTab("compras");
+    $("pantryStatus").textContent = "Sua despensa está vazia. Marque “Já tenho” nos itens da lista ou anote aqui o que você tem, e toque de novo.";
+    $("pantryPart").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+  showTab("cardapio"); window.scrollTo(0, 0);
+  runAI({
+    prompt: fromPantry ? pantryMenuPrompt() : menuPrompt(), go: menuGo, stop: menuStop, status: menuStatus,
+    waitMsg: fromPantry ? "Montando um cardápio só com o que você tem… pode levar até 1 minuto." : "Montando o seu cardápio… pode levar até 1 minuto.",
+    done: j => {
+      if (!Array.isArray(j?.dias) || !j.dias.length) throw { code: "invalid_json" };
+      const meal = o => o && o.nome ? { n: String(o.nome), id: R(o.receita_id) ? o.receita_id : null, t: Math.round(+o.min) || null } : null;
+      menu = {
+        example: false, fromPantry, obs: j.observacao ? String(j.observacao) : "",
+        prep: Array.isArray(j.preparo_antecipado) ? j.preparo_antecipado.map(String) : [],
+        extra: fromPantry && Array.isArray(j.para_completar) ? j.para_completar.map(String).slice(0, 5) : [],
+        dias: j.dias.slice(0, 7).map(d => ({ dia: String(d.dia || ""), cafe: meal(d.cafe), almoco: meal(d.almoco), lanche: meal(d.lanche), jantar: meal(d.jantar) })),
+      };
+      store.set("cl-menu", menu); renderMenu();
+      menuStatus.textContent = fromPantry
+        ? "Cardápio com o que você tem, pronto e salvo. Toque nos pratos sublinhados para ver a receita."
+        : "Cardápio pronto e salvo. Toque nos pratos sublinhados para ver a receita.";
+    },
+  });
+}
+menuGo.onclick = () => genMenu(false);
+$("menuPantryGo").onclick = () => genMenu(true);
+$("pantryMenuGo").onclick = () => genMenu(true);
+
+// Lista de compras
+const PERIODS = { dia: "1 dia", semana: "1 semana", mes: "1 mês" };
+const it = (item, qtd, custo) => ({ item, qtd, custo });
+const EXAMPLE_LIST = { example: true, periodo: "semana", secoes: [
+  { nome: "Hortifrúti", itens: [it("Banana", "1 dúzia", 8), it("Maçã", "4 un.", 6), it("Mamão", "1 un.", 6), it("Tomate", "1 kg", 7), it("Cenoura", "500 g", 3), it("Abobrinha", "2 un.", 4), it("Batata", "1 kg", 6), it("Batata-doce", "500 g", 3), it("Couve", "1 maço", 4), it("Alface", "1 pé", 3.5), it("Cebola e alho", "500 g + 1 cabeça", 6), it("Limão", "4 un.", 3)] },
+  { nome: "Proteínas", itens: [it("Ovos", "20 un.", 18), it("Peito de frango", "1 kg", 22), it("Carne moída", "500 g", 18), it("Sardinha em lata", "1 lata", 6), it("Atum em lata", "1 lata", 8)] },
+  { nome: "Mercearia", itens: [it("Arroz", "1 kg", 6), it("Feijão", "1 kg", 8), it("Grão-de-bico", "500 g", 9), it("Aveia em flocos", "500 g", 8), it("Flocão de milho", "500 g", 3), it("Milho de pipoca", "500 g", 5), it("Macarrão", "500 g", 5), it("Goma de tapioca", "500 g", 7), it("Cacau em pó 100%", "100 g", 9), it("Molho de tomate", "1 caixa", 3)] },
+  { nome: "Laticínios e padaria", itens: [it("Iogurte natural", "2 potes", 8), it("Leite", "1 L", 5), it("Queijo branco", "250 g", 12), it("Pão integral", "1 pacote", 10), it("Tortilhas", "1 pacote", 9)] },
+], dicas: [
+  "Aveia, cacau, tapioca e milho de pipoca duram mais de uma semana: não precisa comprar toda vez.",
+  "Feira no fim do dia costuma ter frutas e verduras mais baratas.",
+  "Vá ao mercado com a lista e sem fome.",
+] };
+let list = store.get("cl-list", null) || EXAMPLE_LIST;
+let checked = store.get("cl-checked", {});
+let period = store.get("cl-period", "semana");
+
+const fPeriod = $("fPeriod");
+for (const [k, l] of Object.entries(PERIODS)) {
+  const b = document.createElement("button");
+  b.className = "chip"; b.dataset.val = k; b.textContent = l;
+  b.onclick = () => { period = k; store.set("cl-period", k); syncPeriod(); };
+  fPeriod.append(b);
+}
+function syncPeriod() { fPeriod.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.val === period))); }
+
+// status de cada item: "tenho", "comprei" ou nada (itens que já estão na despensa contam como "tenho")
+function itemStatus(k, item) {
+  const v = checked[k];
+  if (v) return v === true ? "comprei" : v;
+  return pantry.tenho.some(t => norm(t) === norm(item)) ? "tenho" : null;
+}
+function updateTotal() {
+  let total = 0, left = 0;
+  list.secoes.forEach((s, si) => s.itens.forEach((i, ii) => {
+    if (tasteOf(i.item) === "nao") return;
+    total += i.custo || 0; if (!itemStatus(si + "." + ii, i.item)) left += i.custo || 0;
+  }));
+  $("listTotal").textContent = brl(total);
+  $("listLeft").textContent = left < total ? "· falta comprar " + brl(left) : "";
+}
+function renderList() {
+  $("listBadge").textContent = (list.example ? "Exemplo · " : "Para ") + (PERIODS[list.periodo] || "");
+  $("shop").innerHTML = list.secoes.map((s, si) => `<div class="sec"><h3>${esc(s.nome)}</h3>${s.itens.map((i, ii) => {
+    const k = si + "." + ii, st = itemStatus(k, i.item);
+    const box = (val, txt) => `<label><input type="checkbox" data-k="${k}" data-st="${val}"${st === val ? " checked" : ""}> ${txt}</label>`;
+    const tv = tasteOf(i.item);
+    const tbox = (val, txt) => `<label class="taste"><input type="checkbox" data-name="${esc(i.item)}" data-taste="${val}"${tv === val ? " checked" : ""}> ${txt}</label>`;
+    const flag = tv === "gosto" ? ' <span class="like">♥ gosto</span>' : tv === "nao" ? ' <span class="dislike">não gosto · fora da conta</span>' : "";
+    return `<div class="item${st ? " done" : ""}${tv === "nao" ? " disliked" : ""}"><span><span class="nm">${esc(i.item)} <span class="q">${esc(i.qtd)}</span></span>${flag}</span><span class="p">${i.custo ? brl(i.custo) : ""}</span><span class="marks"><span class="grp">${box("tenho", "Já tenho")}${box("comprei", "Comprei")}</span><span class="grp">${tbox("gosto", "Gosto")}${tbox("nao", "Não gosto")}</span></span></div>`;
+  }).join("")}</div>`).join("");
+  $("shop").querySelectorAll("input[data-taste]").forEach(cb => cb.onchange = () => {
+    setTaste(cb.dataset.name, cb.checked ? cb.dataset.taste : null); renderList(); render();
+  });
+  $("shop").querySelectorAll("input[data-k]").forEach(cb => cb.onchange = () => {
+    const [si, ii] = cb.dataset.k.split(".").map(Number), name = list.secoes[si].itens[ii].item;
+    if (cb.checked) { checked[cb.dataset.k] = cb.dataset.st; addPantry(name, "tenho"); }
+    else { delete checked[cb.dataset.k]; pantry = { ...pantry, tenho: without(pantry.tenho, name) }; }
+    store.set("cl-checked", checked); savePantry();
+  });
+  $("listTips").hidden = !list.dicas.length;
+  $("listTips").innerHTML = `<b>Dicas para economizar:</b><ul>${list.dicas.map(d => `<li>${esc(d)}</li>`).join("")}</ul>`;
+  updateTotal();
+}
+
+function menuAsText(days) {
+  return days.map(d => d.dia + ": " + MEAL_KEYS.map(([k, l]) => {
+    const ml = d[k]; if (!ml || !isHome(d.dia, k)) return "";
+    const r = ml.id && R(ml.id);
+    return l + " " + ml.n + (r ? " [" + r.i.join("; ") + "]" : "");
+  }).filter(Boolean).join(" | ")).join("\n");
+}
+function listPrompt() {
+  const scope = {
+    dia: "Lista para 1 dia. Considere só o primeiro dia do cardápio.",
+    semana: "Lista para 1 semana.",
+    mes: "Lista para 1 mês: não perecíveis e itens que congelam para 4 semanas; frutas, verduras, pães e laticínios só para a primeira semana. Nas dicas, diga o que repor toda semana.",
+  }[period];
+  const base = $("useMenu").checked
+    ? "Cardápio da pessoa (ingredientes entre colchetes):\n" + menuAsText(period === "dia" ? menu.dias.slice(0, 1) : menu.dias)
+    : "Não há cardápio: monte a lista com itens básicos, saudáveis e baratos para refeições rápidas que combinem com o perfil.";
+  return `Você ajuda uma pessoa no Brasil a fazer compras de mercado saudáveis, sustentáveis e baratas.
+Perfil:
+${profileText()}
+
+${base}
+
+${scope}
+Regras:
+- Compre só para as refeições feitas em casa (veja o perfil). Nada para refeições fora de casa.
+- A pessoa JÁ TEM em casa (não coloque na lista): ${pantryText().tenho}.
+- A pessoa NÃO TEM e precisa comprar (inclua na lista): ${pantryText().falta}.
+- Quantidades para o número de pessoas, em unidades de mercado (kg, g, L, dúzia, maço, lata, pacote).
+- Agrupe por seção: Hortifrúti, Proteínas, Mercearia, Laticínios e padaria, Congelados, Temperos (só as seções necessárias).
+- Nada de alergias nem do que a pessoa não gosta. Inclua os alimentos que ela quer no cardápio. Evite ultraprocessados e embalagens individuais.
+- Custo estimado em reais com preços médios de supermercado no Brasil.
+- Se houver orçamento mensal, respeite a parte proporcional ao período e diga nas dicas se ficou acima.
+Responda só com JSON neste formato:
+{"secoes":[{"nome":string,"itens":[{"item":string,"qtd":string,"custo":number}]}],"dicas":[string]}`;
+}
+listGo.onclick = () => runAI({
+  prompt: listPrompt(), go: listGo, stop: listStop, status: listStatus,
+  waitMsg: "Montando a sua lista… pode levar até 1 minuto.",
+  done: j => {
+    if (!Array.isArray(j?.secoes) || !j.secoes.length) throw { code: "invalid_json" };
+    list = {
+      example: false, periodo: period,
+      secoes: j.secoes.filter(s => Array.isArray(s?.itens)).map(s => ({ nome: String(s.nome || "Outros"), itens: s.itens.map(i => it(String(i.item || ""), String(i.qtd || ""), Math.max(0, +i.custo || 0))) })),
+      dicas: Array.isArray(j.dicas) ? j.dicas.map(String) : [],
+    };
+    checked = {};
+    store.set("cl-list", list); store.set("cl-checked", checked); renderList();
+    listStatus.textContent = "Lista pronta e salva. Marque os itens conforme for comprando.";
+  },
+});
+
+$("listCopy").onclick = () => {
+  const text = "Lista de compras (" + (PERIODS[list.periodo] || "") + ")\n\n" + list.secoes.map((s, si) =>
+    s.nome + "\n" + s.itens.filter(i => tasteOf(i.item) !== "nao").map((i, ii) => (itemStatus(si + "." + ii, i.item) ? "✓ " : "- ") + i.item + " (" + i.qtd + ")").join("\n")).join("\n\n");
+  const fb = $("copyFallback");
+  const fallback = () => { fb.value = text; fb.hidden = false; fb.select(); listStatus.className = "status"; listStatus.textContent = "Não consegui copiar sozinho. O texto está selecionado abaixo: copie e cole no WhatsApp ou nas notas."; };
+  try {
+    navigator.clipboard.writeText(text).then(() => { fb.hidden = true; listStatus.className = "status"; listStatus.textContent = "Lista copiada. Cole no WhatsApp ou nas notas do celular."; }, fallback);
+  } catch { fallback(); }
+};
+
+// Abas
+const TABS = ["receitas", "cardapio", "compras"];
+function showTab(t) {
+  if (t === "despensa") t = "compras";
+  if (!TABS.includes(t)) t = "receitas";
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
+  $("tab-receitas").hidden = t !== "receitas";
+  $("tab-plan").hidden = t !== "cardapio" && t !== "compras";
+  $("view-cardapio").hidden = t !== "cardapio";
+  $("view-compras").hidden = t !== "compras";
+}
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => showTab(b.dataset.tab));
+$("toList").onclick = () => { showTab("compras"); window.scrollTo(0, 0); };
+$("favToggle").addEventListener("click", () => showTab("receitas"));
+
+// Necessidades: sugestões rápidas
+const NEEDS = ["Comida mais leve à noite", "Opções de doces saudáveis", "Lanches práticos para levar", "Mais proteína", "Mais fibras e saciedade", "Café da manhã rápido", "Menos açúcar", "Menos sal", "Mais frutas e verduras", "Algo para a fome da tarde"];
+const needBox = $("pNecessidades"), needChips = $("needChips");
+const needList = () => needBox.value.split(/[,;\n]+/).map(t => t.trim()).filter(Boolean);
+function syncNeeds() {
+  const cur = needList().map(norm);
+  needChips.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", String(cur.includes(norm(b.dataset.need)))));
+}
+for (const n of NEEDS) {
+  const b = document.createElement("button");
+  b.className = "chip"; b.textContent = n; b.dataset.need = n;
+  b.onclick = () => {
+    const cur = needList();
+    const i = cur.findIndex(t => norm(t) === norm(n));
+    if (i >= 0) cur.splice(i, 1); else cur.push(n);
+    needBox.value = cur.join(", ");
+    needBox.dispatchEvent(new Event("input"));
+  };
+  needChips.append(b);
+}
+needBox.addEventListener("input", syncNeeds);
+syncNeeds();
+
+// Despensa
+let pantry = store.get("cl-pantry", { tenho: [], falta: [] });
+const PANTRY_SUG = ["Arroz", "Feijão", "Ovos", "Aveia", "Banana", "Leite", "Iogurte natural", "Azeite", "Sal", "Alho", "Cebola", "Tomate", "Frango", "Atum em lata", "Macarrão", "Goma de tapioca", "Cacau em pó", "Pão integral", "Batata", "Cenoura"];
+const pantryText = () => ({
+  tenho: pantry.tenho.length ? pantry.tenho.join(", ") : "nada informado",
+  falta: pantry.falta.length ? pantry.falta.join(", ") : "nada informado",
+});
+const without = (arr, name) => arr.filter(t => norm(t) !== norm(name));
+function addPantry(name, to) {
+  name = name.trim(); if (!name) return;
+  name = name.charAt(0).toUpperCase() + name.slice(1);
+  const other = to === "tenho" ? "falta" : "tenho";
+  pantry = { ...pantry, [other]: without(pantry[other], name), [to]: without(pantry[to], name).concat(name) };
+}
+function savePantry() { store.set("cl-pantry", pantry); renderPantry(); renderList(); }
+function addFromInput(to) {
+  const inp = $("pantryInput");
+  const names = inp.value.split(/[,;\n]+/).filter(t => t.trim());
+  if (!names.length) { inp.focus(); return; }
+  names.forEach(n => addPantry(n, to)); inp.value = ""; savePantry();
+  $("pantryStatus").textContent = (names.length === 1 ? "1 item adicionado" : names.length + " itens adicionados") + (to === "tenho" ? " em “Já tenho”." : " em “Não tenho”.");
+}
+$("addTenho").onclick = () => addFromInput("tenho");
+$("addFalta").onclick = () => addFromInput("falta");
+$("pantryInput").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addFromInput("tenho"); } });
+const pantrySug = $("pantrySug");
+for (const n of PANTRY_SUG) {
+  const b = document.createElement("button");
+  b.className = "chip"; b.textContent = n; b.dataset.item = n;
+  b.onclick = () => {
+    if (pantry.tenho.some(t => norm(t) === norm(n))) pantry = { ...pantry, tenho: without(pantry.tenho, n) };
+    else addPantry(n, "tenho");
+    savePantry();
+  };
+  pantrySug.append(b);
+}
+function pantryRows(key) {
+  const items = pantry[key];
+  if (!items.length) return `<p class="pempty">${key === "tenho" ? "Nada ainda. Escreva acima ou toque nas sugestões." : "Nada faltando por enquanto. O que você anotar aqui entra na lista de compras."}</p>`;
+  return items.map((n, i) => `<div class="pitem"><span>${esc(n)}</span><button class="mini" data-key="${key}" data-i="${i}" data-act="move">${key === "tenho" ? "Acabou" : "✓ Comprei"}</button><button class="mini" data-key="${key}" data-i="${i}" data-act="del" aria-label="Remover ${esc(n)}">×</button></div>`).join("");
+}
+function renderPantry() {
+  $("listTenho").innerHTML = pantryRows("tenho");
+  $("listFalta").innerHTML = pantryRows("falta");
+  $("nTenho").textContent = pantry.tenho.length;
+  $("nFalta").textContent = pantry.falta.length;
+  pantrySug.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", String(pantry.tenho.some(t => norm(t) === norm(b.dataset.item)))));
+  document.querySelectorAll(".pantry .mini").forEach(b => b.onclick = () => {
+    const key = b.dataset.key, name = pantry[key][+b.dataset.i];
+    if (b.dataset.act === "del") pantry = { ...pantry, [key]: without(pantry[key], name) };
+    else addPantry(name, key === "tenho" ? "falta" : "tenho");
+    savePantry();
+  });
+}
+$("aiUsePantry").onclick = () => {
+  if (!pantry.tenho.length) { aiStatus.className = "status"; aiStatus.textContent = "Sua despensa está vazia. Anote o que você tem em “Minha despensa”, na aba Lista de compras."; return; }
+  $("aiHave").value = pantry.tenho.join(", ");
+  aiStatus.textContent = "";
+};
+renderPantry();
+
+// Refeições em casa
+function mealsText() {
+  return Object.entries(MEALS).map(([k, l]) => {
+    const v = meals[k] || {};
+    return l + ": " + (v.u && v.f ? "todos os dias" : v.u ? "só dias úteis" : v.f ? "só fim de semana" : "nunca (fora de casa)");
+  }).join("; ");
+}
+const mbGrid = $("mbGrid");
+for (const [k, l] of Object.entries(MEALS)) {
+  const row = document.createElement("div");
+  row.className = "mb-meal";
+  row.innerHTML = `<span class="nm">${l === "Café da manhã" ? "Café" : l}</span>`;
+  for (const [w, wl] of [["u", "Seg a sex"], ["f", "Sáb e dom"]]) {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = wl; b.dataset.meal = k; b.dataset.when = w;
+    b.setAttribute("aria-label", l + ", " + wl);
+    b.onclick = () => {
+      meals = { ...meals, [k]: { ...meals[k], [w]: !meals[k]?.[w] } };
+      try { localStorage.setItem("cl-meals", JSON.stringify(meals)); } catch {}
+      if (state.meal && !mealActive(state.meal)) state.meal = null;
+      syncMeals(); syncChips(); render(); renderMenu();
+    };
+    row.append(b);
+  }
+  mbGrid.append(row);
+}
+function syncMeals() { mbGrid.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", String(!!meals[b.dataset.meal]?.[b.dataset.when]))); }
+
+syncMeals(); syncChips(); render();
+syncPeriod(); renderMenu(); renderList(); showTab(location.hash.slice(1));
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
+</script>
+</body>
+</html>
